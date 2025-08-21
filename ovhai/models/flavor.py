@@ -86,7 +86,7 @@ class Flavor:
 
         _gpu_information = d.pop("gpuInformation", UNSET)
         gpu_information: Union[Unset, GpuInformation]
-        if isinstance(_gpu_information, Unset):
+        if isinstance(_gpu_information, Unset) or _gpu_information is None:
             gpu_information = UNSET
         else:
             gpu_information = GpuInformation.from_dict(_gpu_information)
