@@ -24,6 +24,8 @@ def _parse_response(
     if response.status_code == HTTPStatus.OK:
         response_200 = []
         _response_200 = response.json()
+        if not isinstance(_response_200, list):
+            _response_200 = [_response_200]
         for response_200_item_data in _response_200:
             response_200_item = ProjectQuotas.from_dict(response_200_item_data)
 
