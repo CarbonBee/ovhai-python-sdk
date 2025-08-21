@@ -1,27 +1,120 @@
-[tool.poetry]
+[project]
 name = "ovhai"
-version = "0.1a4"
+version = "0.1a5"
 description = "A client library for accessing OVHcloud's AI Solutions"
-authors = ["Mathieu Busquet <mathieu.busquet@ovhcloud.com>"]
 readme = "README.md"
-packages = [
-    {include = "ovhai"},
+authors = [
+    { name = "Mathieu Busquet", email = "mathieu.busquet@ovhcloud.com" },
+    { name = "Anthony Gelibert", email = "anthony.gelibert@carbonbee.fr" },
+    { name = "Camille Francon", email = "camille.francon@carbonnee.fr" },
 ]
-include = ["CHANGELOG.md", "ovhai/py.typed"]
+requires-python = "~=3.13.0"
+dependencies = [
+    "httpx~=0.28",
+    "attrs~=25.3",
+    "python-dateutil>=2.9",
+]
+keywords = ["ovhai", "ovh", "AI"]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Development Status :: 3 - Alpha",
+    "Typing :: Typed"
+]
 
+[project.urls]
+Homepage = "https://github.com/CarbonBee/ovhai-python-sdk"
 
-[tool.poetry.dependencies]
-python = "^3.8"
-httpx = ">=0.20.0,<0.28.0"
-attrs = ">=21.3.0"
-python-dateutil = "^2.8.0"
+[dependency-groups]
+dev = [
+    "ruff~=0.12",
+    "mypy~=1.17",
+    "pip~=25.2"
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build~=0.8"]
+build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 120
+target-version = "py313"
+output-format = "concise"
 
 [tool.ruff.lint]
-select = ["F", "I", "UP"]
+allowed-confusables = ["’"]
+# By default, enable *all* lint rules.
+select = ["ALL"]
+# Enable *preview* to allow “experimental” rules.
+preview = true
+# Source: https://docs.astral.sh/ruff/rules
+#    B024: flake8-bugbear        — Checks for abstract classes without abstract methods.
+#    D107: pydocstyle            — Missing docstring in __init__.
+#    D203: pydocstyle            — 1 blank line required before class docstring.
+#    D212: pydocstyle            — Multi-line docstring summary should start at the first line.
+#    S101: flake8-bandit         — Use of assert detected.
+#    T201: flake8-print          — print found.
+#  TID252: flake8-tidy-imports   — Checks for relative imports.
+ignore = ["B024", "D107", "D203", "D212", "S101", "T201", "TID252"]
+# Add some ignores that shouldn’t be in the “regular” list but are useful.
+#     CPY: flake8-copyright    — Ignore **EVERYTHING**.
+#     DOC: pydoclint           — Ignore **EVERYTHING**.
+#    I001: isort               — Ignore the import problems… Required until ruff implements all the options of isort for the multilines.
+#    S404: flake8-bandit       — subprocess module is possibly insecure.
+extend-ignore = ["CPY", "DOC", "I001", "S404"]
+
+[tool.ruff.lint.isort]
+no-lines-before = ["local-folder"]
+order-by-type = false
+relative-imports-order = "closest-to-furthest"
+
+[tool.mypy]
+plugins = []
+# Start by enabling the strict mode.
+strict = true
+# To force the following of the untyped imports.
+follow_untyped_imports = true
+# Add stubs
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
+# Check that types have no Any components due to missing imports.
+disallow_any_unimported = true
+# Don’t assume arguments with default values of None are Optional.
+no_implicit_optional = true
+# Warn about unused '[mypy-<pattern>]' or '[[tool.mypy.overrides]]' config sections.
+warn_unused_configs = true
+# Check that statement or expression is unreachable
+warn_unreachable = true
+# Show error codes in error messages
+show_error_codes = true
+# https://mypy.readthedocs.io/en/stable/error_code_list2.html#error-codes-optional
+# Error codes:
+#       ignore-without-code — Check that # type: ignore include an error code.
+#         explicit-override — Check that @override is used when overriding a base class method.
+#          mutable-override — Check that overrides of mutable attributes are safe.
+# narrowed-type-not-subtype — Check that TypeIs narrows types.
+#        possibly-undefined — Warn about variables that are defined only in some execution paths.
+#            redundant-expr — Check that expression is redundant.
+#            redundant-self — Check that methods do not have redundant Self annotations.
+#               truthy-bool — Check that expression is not implicitly true in boolean context.
+#           truthy-iterable — Check that iterable is not implicitly true in boolean context.
+#         unimported-reveal — Check that reveal_type is imported from typing or typing_extensions.
+#          unused-awaitable — Check that awaitable return value is used.
+enable_error_code = [
+    "explicit-override",
+    "ignore-without-code",
+    "mutable-override",
+    "narrowed-type-not-subtype",
+    "possibly-undefined",
+    "redundant-expr",
+    "redundant-self",
+    "truthy-bool",
+    "truthy-iterable",
+    "unimported-reveal",
+    "unused-awaitable",
+]
+# Enable some incomplete feature:
+# - PreciseTupleTypes: PEP 646. This feature will infer more precise tuple types in various scenarios.
+enable_incomplete_feature = ["PreciseTupleTypes"]
